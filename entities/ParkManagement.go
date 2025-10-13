@@ -8,7 +8,6 @@ import (
 // `key:value` : struct tag cho thư viện đọc và mappping đúng giá trị 
 type ParkManagement struct {
 
-
 	// field
     UserID      string    `gorm:"primaryKey;type:varchar(20)"`
     ParkName    string    `gorm:"type:varchar(30);not null"`
