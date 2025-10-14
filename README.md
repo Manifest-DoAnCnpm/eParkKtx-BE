@@ -1,7 +1,7 @@
 
 ## Mục lục
 
-[README](README.md) | [MESSAGE-RULE](commit-message.md) 
+[README](README.md) | [MESSAGE-RULE](MESSAGE-RULE.md) 
 
 # eParkKTX
 
