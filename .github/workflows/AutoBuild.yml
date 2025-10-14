@@ -5,7 +5,7 @@ name: Go build
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "production" ]
 
 jobs:
 
