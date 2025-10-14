@@ -14,9 +14,7 @@ type Vehicle struct {
 	RegisterDate time.Time `gorm:"type:date;not null"`
 	Color string `gorm:"type:varchar(20)"`
 
-	StudentID Student `gorm:"foreignKey:UserID"`
-	ParkManagementID ParkManagement `gorm:"foreignKey:UserID"`
-
-
+	StudentID Student `gorm:"foreignKey:StudentID;constraint:OnDelete:CASCADE"`
+	ParkManagementID ParkManagement `gorm:"foreignKey:ParkManagementID;constraint:OnDelete:CASCADE"`
 
 }
