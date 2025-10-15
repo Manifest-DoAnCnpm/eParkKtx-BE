@@ -16,7 +16,7 @@ func NewParkManagementRepo(userRepo *UserRepo) *ParkManagementRepo {
     return &ParkManagementRepo{UserRepo: userRepo}
 }
 
-// create student
+
 func (repo *StudentRepo) CreateNewParkManagement(ParkManagement *entities.ParkManagement) error {
     // tạo user trước
     if err := repo.UserRepo.CreateNewUser(&ParkManagement.User); err != nil {

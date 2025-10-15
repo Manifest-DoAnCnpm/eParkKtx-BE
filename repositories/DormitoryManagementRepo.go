@@ -16,7 +16,7 @@ func NewDormitoryManagementRepo(userRepo *UserRepo) *DormitoryManagementRepo {
     return &DormitoryManagementRepo{UserRepo: userRepo}
 }
 
-// create student
+
 func (repo *StudentRepo) CreateNewDormitoryManagement(DormitoryManagement *entities.DormitoryManagement) error {
     // tạo user trước
     if err := repo.UserRepo.CreateNewUser(&DormitoryManagement.User); err != nil {
