@@ -3,6 +3,7 @@ package repositories
 import (
 	"eParkKtx/config"
 	"eParkKtx/entities"
+	"errors"
 
 	"gorm.io/gorm"
 )
@@ -35,30 +36,33 @@ func (r *UserRepo) GetByID(ID string) (*entities.User, error) {
 }
 
 func (r *UserRepo) GetByName(Name string) (*entities.User, error) {
-	var user entities.User
+	var user entities.User;
 
 	if err := r.DB.First(&user, "Name = ?", Name).Error; err != nil { // if <khai báo biến>; <condition>{}
-		return nil, err
+		return nil, err;
 	}
-	return &user, nil // trả về con trỏ tới user vừa tạo và nil -> ko lỗi
+	return &user, nil; // trả về con trỏ tới user vừa tạo và nil -> ko lỗi
 }
 
 // Get all users
 func (r *UserRepo) GetAll() ([]entities.User, error) {
-	var users []entities.User
+	var users []entities.User;
 	if err := r.DB.Find(&users).Error; err != nil { // nil là null
-		return nil, err
+		return nil, err;
 	}
-	return users, nil
+	return users, nil;
 }
 
 func (repo *UserRepo) Update(newU *entities.User) error {
 
+	if newU.UserID == "" {
+		return errors.New("userID cannot be empty");
+	}
 	var user entities.User
 	if err := repo.DB.First(&user, "UserID = ?", newU.UserID).Error; err != nil {
-		return err
+		return errors.New("undefined user");
 	}
 
-	repo.DB.Save(newU)
+	repo.DB.Save(newU);
 	return nil
 }

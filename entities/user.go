@@ -13,7 +13,7 @@ type User struct {
 
 	// field
     UserID      string    `gorm:"primaryKey;type:varchar(20)"`
-    Password    string    `gorm:"type:varchar(30);not null"`
+    Password    string    `gorm:"type:varchar(100);not null"`
     Name        string    `gorm:"type:varchar(100);not null"`
     DoB         time.Time `json:"dob"`
     Gender      string    `gorm:"type:varchar(10)"`

@@ -3,7 +3,7 @@ package repositories
 
 import (
     "eParkKtx/entities"
-   
+   "errors"
 )
 
 
@@ -18,6 +18,13 @@ func NewStudentRepo(userRepo *UserRepo) *StudentRepo {
 
 // create student
 func (repo *StudentRepo) CreateNewStudent(student *entities.Student) error {
+
+    // kiểm tra user có tồn tại chưa
+	_, err := repo.UserRepo.GetByID(student.User.UserID)
+	if err == nil {
+		return errors.New("user already exists")
+	}
+
     // tạo user trước
     if err := repo.UserRepo.CreateNewUser(&student.User); err != nil {
         return err
