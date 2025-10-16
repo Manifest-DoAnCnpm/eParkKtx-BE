@@ -28,5 +28,3 @@ func (repo *StudentRepo) CreateNewStudent(student *entities.Student) error {
 }
 
 
-
-

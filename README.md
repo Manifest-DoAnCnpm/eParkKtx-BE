@@ -7,6 +7,25 @@
 
 **eParkKTX** là một hệ thống quản lý bãi đỗ xe thông minh dành cho sinh viên và cư dân trong khu ký túc xá. Dự án giúp tối ưu hóa việc quản lý xe, tiết kiệm thời gian tìm chỗ đậu và hỗ trợ giám sát an ninh, thông qua giao diện web trực quan và dễ sử dụng.
 
+## Cấu trúc dự án
+```
+[Request từ Client]
+        ↓
+[Middleware → kiểm tra token, log,...]
+        ↓
+[Router → match URL]
+        ↓
+[Controller → bind JSON, gọi service]
+        ↓
+[Service → xử lý nghiệp vụ]
+        ↓
+[Repository → truy vấn DB]
+        ↓
+[Response → trả về Client]
+
+```
+
+
 ## Tính năng chính
 
 - **Quản lý sinh viên và xe**: Đăng ký, cập nhật thông tin sinh viên và phương tiện.
