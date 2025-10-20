@@ -10,11 +10,11 @@
 ## Cấu trúc dự án
 ```
 [Request từ Client]
-        ↓
+        ↓ dto
 [Middleware → kiểm tra token, log,...]
-        ↓
+        ↓ dto
 [Router → match URL]
-        ↓
+        ↓ dto 
 [Controller → bind JSON, gọi service]
         ↓
 [Service → xử lý nghiệp vụ]
