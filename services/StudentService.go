@@ -52,34 +52,31 @@ func (Sservice *StudentService) CreateStudent(Student *entities.Student) error {
 }
 
 
-func (Sservice *StudentService) GetStudentByName(Student *entities.Student) (*entities.Student,error){
+// func (Sservice *StudentService) GetStudentByName(Student *entities.Student) (*entities.Student,error){
 
-	ExistedStudent , err := Sservice.UserService.GetUserByName(&Student.User);
+// 	ExistedStudent , err := Sservice.UserService.GetUserByName(&Student.User);
 
-	if err != nil{
-		return err;
-	}
+// 	if err != nil{
+// 		return err;
+// 	}
 
+// }
 
+// func (Userv *UserService) GetStudentByID(ID string, Password string)  (*entities.User,error){
 
+// 	ExistedUser, err := Userv.UserRepo.GetByID(ID);
+// 	if  err != nil {
+// 		return nil,err;
+// 	}
 
-}
+// 	IsMatched := bcrypt.CompareHashAndPassword([]byte(ExistedUser.Password), []byte(Password));
 
-func (Userv *UserService) GetStudentByID(ID string, Password string)  (*entities.User,error){
+// 	if IsMatched != nil{
+// 		return nil, IsMatched;
+// 	}
 
-	ExistedUser, err := Userv.UserRepo.GetByID(ID);
-	if  err != nil {
-		return nil,err;
-	}
-
-	IsMatched := bcrypt.CompareHashAndPassword([]byte(ExistedUser.Password), []byte(Password));
-
-	if IsMatched != nil{
-		return nil, IsMatched;
-	}
-
-	return ExistedUser, nil;
-}
+// 	return ExistedUser, nil;
+// }
 
 
 
