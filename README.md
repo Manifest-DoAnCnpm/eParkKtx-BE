@@ -25,6 +25,37 @@
 
 ```
 
+## Cách chạy
+```
+go mod init eparkktx
+```
+
+```
+go get github.com/payOSHQ/payos-lib-golang
+```
+
+```
+go run main.go
+```
+
+# API 
+```
+POST http://localhost:8080/create-payment
+```
+
+header:
+ - Content-Type: application/json
+body-example:
+```
+{
+  "amount": 50000,
+  "description": "Thanh toán phí gửi xe tháng 10"
+}
+
+```
+
+
+
 
 ## Tính năng chính
 
