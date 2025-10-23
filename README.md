@@ -45,7 +45,7 @@ POST http://localhost:8080/create-payment
 
 header:
  - Content-Type: application/json
-body-example:
+ - body-example:
 ```
 {
   "amount": 50000,
