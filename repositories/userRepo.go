@@ -12,6 +12,7 @@ type UserRepository interface {
 	NewUserRepository()
 	CreateNewUser(user *entities.User) error
 	GetByName(Name string) (*entities.User, error)
+	Delete(ID string) error // Thêm hàm delete
 }
 
 type UserRepo struct {
@@ -66,3 +67,21 @@ func (repo *UserRepo) Update(newU *entities.User) error {
 	repo.DB.Save(newU);
 	return nil
 }
+
+func (repo *UserRepo) Delete(ID string) error {
+	// Tìm và xóa user dựa trên ID
+    result := repo.DB.Delete(&entities.User{}, "UserID = ?", ID)
+    
+    // Nếu có lỗi trong quá trình xóa (trừ trường hợp không tìm thấy)
+    if result.Error != nil {
+        return result.Error
+    }
+    
+    // Tùy chọn: Kiểm tra xem có bản ghi nào bị xóa hay không (nếu cần xác nhận user tồn tại)
+    if result.RowsAffected == 0 {
+        return errors.New("user not found")
+    }
+	
+    return nil
+}
+
