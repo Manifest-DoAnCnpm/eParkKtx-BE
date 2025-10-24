@@ -10,7 +10,7 @@ type Garage struct {
 
 	// field
     GarageID string `gorm:"primaryKey;type:varchar(20)"`
-    GarageName string `gorm:"type:varchar(30)"`
+    GarageName string `gorm:"type:varchar(30);not null"` //add not null
 	Size int `gorm:"type:int;not null"`
 	UserID string `gorm:"type:varchar(20);not null"`
 	
