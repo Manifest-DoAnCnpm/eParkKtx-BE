@@ -1,25 +1,19 @@
 package services
 
 import (
+	request "eParkKtx/dto/Request"
 	"eParkKtx/entities"
 	"eParkKtx/repositories"
 	"log"
+	"time"
+
+	"github.com/google/uuid"
 )
 
-
-
-
-
-
 /*
-	WARNING: CHANG PARAMATERS OF FUNCTION TO DTO LATER
-	
+	WARNING: CHANGE PARAMATERS OF FUNCTION TO DTO LATER
+
 */
-
-
-
-
-
 
 /*
 	Student service:
@@ -27,30 +21,60 @@ import (
 */
 
 type StudentService struct {
-	UserService *UserService; // composition userservice into subclass service
-	StudentRepo *repositories.StudentRepo;
-
+	UserService *UserService // composition userservice into subclass service
+	StudentRepo *repositories.StudentRepo
 }
 
-//------------------------Constructor---------------------------------------
+// ------------------------Constructor---------------------------------------
 func NewStudentService(UserService *UserService, StudentRepo *repositories.StudentRepo) *StudentService {
 	return &StudentService{UserService: UserService, StudentRepo: StudentRepo}
 }
 
 //------------------------Method---------------------------------------
 
-func (Sservice *StudentService) CreateStudent(Student *entities.Student) error {
+// parseDateOfBirth chuyển đổi chuỗi ngày tháng sang time.Time
+func parseDateOfBirth(dobString string) time.Time {
+	// Định dạng: "2006-01-02"
+	dob, err := time.Parse("2006-01-02", dobString)
+	if err != nil {
+		log.Printf("[StudentService] Error parsing date of birth: %v", err)
+		return time.Now() // Trả về thời gian hiện tại nếu có lỗi
+	}
+	return dob
+}
 
-	Sservice.UserService.CreateUser(&Student.User);
+func (s *StudentService) CreateStudent(req request.CreateStudentRequest) error {
+	// Tạo user trước
+	user := &entities.User{
+		UserID:      uuid.New().String(),
+		Name:        req.UserRequest.Name,
+		Password:    req.UserRequest.Password, // Mật khẩu sẽ được hash trong UserService
+		PhoneNumber: req.UserRequest.PhoneNumber,
+		DoB:         parseDateOfBirth(req.UserRequest.DoB),
+		Gender:      req.UserRequest.Gender,
+	}
 
-	if err:= Sservice.StudentRepo.CreateNewStudent(Student); err != nil{
-		log.SetPrefix("[StudentService]");
-		return err;
+	// Tạo user
+	if err := s.UserService.CreateUser(user); err != nil {
+		log.Printf("[StudentService] Failed to create user: %v", err)
+		return err
+	}
+
+	// Tạo student
+	student := &entities.Student{
+		UserID: user.UserID, // Giả sử UserID được tạo tự động bởi database
+		School: req.School,
+		Room:   req.Room,
+	}
+
+	// Lưu student vào database
+	if err := s.StudentRepo.CreateNewStudent(student); err != nil {
+		log.Printf("[StudentService] Failed to create student: %v", err)
+		return err
 	}
 
 	return nil
 }
-
 
 // func (Sservice *StudentService) GetStudentByName(Student *entities.Student) (*entities.Student,error){
 
@@ -77,10 +101,3 @@ func (Sservice *StudentService) CreateStudent(Student *entities.Student) error {
 
 // 	return ExistedUser, nil;
 // }
-
-
-
-
-
-
-

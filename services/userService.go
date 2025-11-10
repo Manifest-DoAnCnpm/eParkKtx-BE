@@ -9,17 +9,9 @@ import (
 	"golang.org/x/crypto/bcrypt" // for encrypte password
 )
 
-
-
-
 /*
 	WARNING: CHANG PARAMATERS OF FUNCTION TO DTO LATER
 */
-
-
-
-
-
 
 /*
 	User service:
@@ -32,33 +24,43 @@ type UserService struct {
 	UserRepo *repositories.UserRepo
 }
 
-
-//------------------------Constructor---------------------------------------
+// ------------------------Constructor---------------------------------------
 func NewUserService(userRepo *repositories.UserRepo) *UserService {
 	return &UserService{UserRepo: userRepo}
 }
 
-
-
 //------------------------Method---------------------------------------
 
-func (Userv *UserService) CreateUser(User *entities.User) error {
-
-	if User.Name == "" || User.Password == "" || len(User.PhoneNumber) < 10 {
-		log.SetPrefix("[UserService]: ")
-		return errors.New("user name or password cannot be empty")
+// CreateUser tạo mới user từ đối tượng User
+func (us *UserService) CreateUser(user *entities.User) error {
+	// Validate dữ liệu đầu vào
+	if user.Name == "" || user.Password == "" || len(user.PhoneNumber) < 10 {
+		log.Printf("[UserService] Invalid user data: name=%s, phone=%s", user.Name, user.PhoneNumber)
+		return errors.New("invalid user data")
 	}
 
-	// check name
-	if CheckUser, err := Userv.UserRepo.GetByName(User.Name); CheckUser != nil {
-		log.SetPrefix("[UserService]: ")
-		return err;
+	// Kiểm tra tên đã tồn tại chưa
+	existingUser, _ := us.UserRepo.GetByName(user.Name)
+	if existingUser != nil {
+		log.Printf("[UserService] Username already exists: %s", user.Name)
+		return errors.New("username already exists")
 	}
 
-	// encrypte before saving to db
-	User.Password, _ = HashPassword(User.Password)
+	// Mã hóa mật khẩu
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	if err != nil {
+		log.Printf("[UserService] Failed to hash password: %v", err)
+		return errors.New("failed to process password")
+	}
 
-	Userv.UserRepo.CreateNewUser(User)
+	// Cập nhật mật khẩu đã mã hóa
+	user.Password = string(hashedPassword)
+
+	// Lưu vào database
+	if err := us.UserRepo.CreateNewUser(user); err != nil {
+		log.Printf("[UserService] Failed to create user in database: %v", err)
+		return err
+	}
 
 	return nil
 }
@@ -77,38 +79,34 @@ func CheckPassword(password, hash string) bool {
 	return err == nil
 }
 
+func (Userv *UserService) GetUserByName(User *entities.User) (*entities.User, error) {
 
-func (Userv *UserService) GetUserByName(User *entities.User) (*entities.User,error){
-
-	ExistedUser, err := Userv.UserRepo.GetByName(User.Name);
-	if  err != nil {
-		return nil,err;
+	ExistedUser, err := Userv.UserRepo.GetByName(User.Name)
+	if err != nil {
+		return nil, err
 	}
 
-	IsMatched := bcrypt.CompareHashAndPassword([]byte(ExistedUser.Password), []byte(User.Password));
+	IsMatched := bcrypt.CompareHashAndPassword([]byte(ExistedUser.Password), []byte(User.Password))
 
-	if IsMatched != nil{
-		return nil, IsMatched;
+	if IsMatched != nil {
+		return nil, IsMatched
 	}
 
-	return ExistedUser, nil;
+	return ExistedUser, nil
 }
 
-func (Userv *UserService) GetUserByID(ID string, Password string)  (*entities.User,error){
+func (Userv *UserService) GetUserByID(ID string, Password string) (*entities.User, error) {
 
-	ExistedUser, err := Userv.UserRepo.GetByID(ID);
-	if  err != nil {
-		return nil,err;
+	ExistedUser, err := Userv.UserRepo.GetByID(ID)
+	if err != nil {
+		return nil, err
 	}
 
-	IsMatched := bcrypt.CompareHashAndPassword([]byte(ExistedUser.Password), []byte(Password));
+	IsMatched := bcrypt.CompareHashAndPassword([]byte(ExistedUser.Password), []byte(Password))
 
-	if IsMatched != nil{
-		return nil, IsMatched;
+	if IsMatched != nil {
+		return nil, IsMatched
 	}
 
-	return ExistedUser, nil;
+	return ExistedUser, nil
 }
-
-
-

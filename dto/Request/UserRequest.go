@@ -3,7 +3,7 @@ package request
 type CreateUserRequest struct {
 	Name        string `json:"name" validate:"required"`
 	Password    string `json:"password" validate:"required,min=6"`
-	PhoneNumber string `json:"phone,omitempty" validate:"required,min=10,max=10"`
+	PhoneNumber string `json:"phone,omitempty" validate:"required,min=10"`
 	DoB         string `json:"dob" validate:"required"`
 	Gender      string `json:"gender" `
 }

@@ -13,8 +13,11 @@ type Vehicle struct {
     VehicleType string `gorm:"type:varchar(30);not null"` //add not null
 	RegisterDate time.Time `gorm:"type:date;not null"`
 	Color string `gorm:"type:varchar(20); not null"` //add not null
-
-	StudentID Student `gorm:"foreignKey:StudentID;constraint:OnDelete:CASCADE"`
-	ParkManagementID ParkManagement `gorm:"foreignKey:ParkManagementID;constraint:OnDelete:CASCADE"`
+	
+    StudentID string `gorm:"type:varchar(20);not null"`
+	ParkManagementID string `gorm:"type:varchar(20);not null"`
+	
+	Student Student `gorm:"foreignKey:StudentID;constraint:OnDelete:CASCADE"`
+	ParkManagement ParkManagement `gorm:"foreignKey:ParkManagementID;constraint:OnDelete:CASCADE"`
 
 }
