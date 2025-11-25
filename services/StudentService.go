@@ -1,12 +1,12 @@
 package services
 
 import (
-	request "eParkKtx/dto/Request"
+	"eParkKtx/dto/request"
 	"eParkKtx/entities"
 	"eParkKtx/repositories"
 	"log"
 	"time"
-
+	"fmt"
 	"github.com/google/uuid"
 )
 
@@ -44,47 +44,65 @@ func parseDateOfBirth(dobString string) time.Time {
 }
 
 func (s *StudentService) CreateStudent(req request.CreateStudentRequest) error {
-	// Tạo user trước
-	user := &entities.User{
-		UserID:      uuid.New().String(),
-		Name:        req.UserRequest.Name,
-		Password:    req.UserRequest.Password, // Mật khẩu sẽ được hash trong UserService
-		PhoneNumber: req.UserRequest.PhoneNumber,
-		DoB:         parseDateOfBirth(req.UserRequest.DoB),
-		Gender:      req.UserRequest.Gender,
-	}
+    log.Printf("[StudentService] Received create student request: %+v", req)
+    
+    // Tạo user trước
+    user := &entities.User{
+        UserID:      uuid.New().String(),
+        Name:        req.UserRequest.Name,
+        Password:    req.UserRequest.Password,
+        PhoneNumber: req.UserRequest.PhoneNumber,
+        DoB:         parseDateOfBirth(req.UserRequest.DoB),
+        Gender:      req.UserRequest.Gender,
+    }
+    log.Printf("[StudentService] Creating user with ID: %s", user.UserID)
 
-	// Tạo user
-	if err := s.UserService.CreateUser(user); err != nil {
-		log.Printf("[StudentService] Failed to create user: %v", err)
-		return err
-	}
+    // Tạo user
+    // if err := s.UserService.CreateUser(user); err != nil {
+    //     log.Printf("[StudentService] Failed to create user: %v", err)
+    //     return fmt.Errorf("failed to create user: %w", err)
+    // }
+    // log.Printf("[StudentService] Successfully created user: %s", user.UserID)
 
-	// Tạo student
-	student := &entities.Student{
-		UserID: user.UserID, // Giả sử UserID được tạo tự động bởi database
-		School: req.School,
-		Room:   req.Room,
-	}
+    // Tạo student
+    student := &entities.Student{
+        UserID: user.UserID,
+        School: req.School,
+        Room:   req.Room,
+        User:   *user,
+    }
+    log.Printf("[StudentService] Creating student with user ID: %s", student.UserID)
 
-	// Lưu student vào database
-	if err := s.StudentRepo.CreateNewStudent(student); err != nil {
-		log.Printf("[StudentService] Failed to create student: %v", err)
-		return err
-	}
+    // Lưu student vào database
+    if err := s.StudentRepo.CreateNewStudent(student); err != nil {
+        log.Printf("[StudentService] Failed to create student: %v", err)
+        return fmt.Errorf("failed to create student: %w", err)
+    }
 
-	return nil
+    log.Printf("[StudentService] Successfully created student with user ID: %s", student.UserID)
+    return nil
 }
 
-// func (Sservice *StudentService) GetStudentByName(Student *entities.Student) (*entities.Student,error){
 
-// 	ExistedStudent , err := Sservice.UserService.GetUserByName(&Student.User);
+func (Sservice *StudentService) GetStudentByName(req request.GetStudentByNameRequest) (*entities.Student,error){
 
-// 	if err != nil{
-// 		return err;
-// 	}
+	ExistedUser , err := Sservice.UserService.GetUserByName(req.Name);
+	
 
-// }
+	if err != nil{
+		return nil, err;
+	}
+
+	ExistedStu , err := Sservice.StudentRepo.GetByStudentID(ExistedUser.UserID)
+
+	if err != nil{
+		return nil,err;
+	}
+
+	return ExistedStu, nil;
+}
+
+
 
 // func (Userv *UserService) GetStudentByID(ID string, Password string)  (*entities.User,error){
 

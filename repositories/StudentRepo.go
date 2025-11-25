@@ -1,37 +1,42 @@
 package repositories
 
-
 import (
-    "eParkKtx/entities"
-   "errors"
+	"eParkKtx/entities"
+	//    "errors"
+	"fmt"
 )
 
-
-type StudentRepo struct{
-	UserRepo *UserRepo; // composition (nhúng userrepo)
+type StudentRepo struct {
+	UserRepo *UserRepo // composition (nhúng userrepo)
 }
 
 // constructor
 func NewStudentRepo(userRepo *UserRepo) *StudentRepo {
-    return &StudentRepo{UserRepo: userRepo}
+	return &StudentRepo{UserRepo: userRepo}
 }
 
 // create student
 func (repo *StudentRepo) CreateNewStudent(student *entities.Student) error {
-
-    // kiểm tra user có tồn tại chưa
-	_, err := repo.UserRepo.GetByID(student.User.UserID)
-	if err == nil {
-		return errors.New("user already exists")
+	// Tạo user trước
+	if err := repo.UserRepo.CreateNewUser(&student.User); err != nil {
+		return fmt.Errorf("failed to create user: %w", err)
 	}
 
-    // tạo user trước
-    if err := repo.UserRepo.CreateNewUser(&student.User); err != nil {
-        return err
-    }
+	// Gán lại user_id từ user vừa tạo
+	student.UserID = student.User.UserID
 
-    return repo.UserRepo.DB.Create(student).Error
+	// Tạo student
+	if err := repo.UserRepo.DB.Create(student).Error; err != nil {
+		return fmt.Errorf("failed to create student: %w", err)
+	}
 
+	return nil
 }
 
-
+func (r *StudentRepo) GetByStudentID(userID string) (*entities.Student, error) {
+	var student entities.Student
+	if err := r.UserRepo.DB.Preload("User").Where("user_id = ?", userID).First(&student).Error; err != nil {
+		return nil, err
+	}
+	return &student, nil
+}

@@ -3,7 +3,7 @@
 // import (
 // 	"encoding/json"
 // 	"fmt"
-// 	"log"
+	
 // 	"net/http"
 // 	"time"
 
@@ -85,19 +85,11 @@
 // 	http.Redirect(w, r, "http://localhost:3000/payment-cancel", http.StatusSeeOther)
 // }
 
-// func main() {
-// 	http.HandleFunc("/create-payment", withCORS(createPaymentLink))
-// 	http.HandleFunc("/payment/success", withCORS(handleSuccess))
-// 	http.HandleFunc("/payment/cancel", withCORS(handleCancel))
+// // func main() {
+// // 	http.HandleFunc("/create-payment", withCORS(createPaymentLink))
+// // 	http.HandleFunc("/payment/success", withCORS(handleSuccess))
+// // 	http.HandleFunc("/payment/cancel", withCORS(handleCancel))
 
-// 	fmt.Println("🚀 Server chạy tại http://localhost:8080")
-// 	log.Fatal(http.ListenAndServe(":8080", nil))
-// }
-
-
-
-
-
-
-
-
+// // 	fmt.Println("🚀 Server chạy tại http://localhost:8080")
+// // 	log.Fatal(http.ListenAndServe(":8080", nil))
+// // }

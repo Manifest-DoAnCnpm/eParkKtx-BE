@@ -24,22 +24,28 @@ func NewUserRepository() *UserRepo {
 }
 
 func (repo *UserRepo) CreateNewUser(user *entities.User) error {
+	    // Kiểm tra user đã tồn tại chưa (sửa lại câu query)
+    var existingUser entities.User
+    if err := repo.DB.Where("name = ?", user.Name).First(&existingUser).Error; err == nil {
+        return errors.New("user with this name already exists")
+    }
 	return repo.DB.Create(user).Error // tạo user trong db
 }
 
-func (r *UserRepo) GetByID(ID string) (*entities.User, error) {
-	var user entities.User
-
-	if err := r.DB.First(&user, "UserID = ?", ID).Error; err != nil { // if <khai báo biến>; <condition>{}
-		return nil, err
-	}
-	return &user, nil // trả về con trỏ tới user vừa tạo và nil -> ko lỗi
+func (r *UserRepo) GetByID(id string) (*entities.User, error) {
+    var user entities.User
+    // Sửa lại câu query để dùng đúng tên cột
+    if err := r.DB.Where("user_id = ?", id).First(&user).Error; err != nil {
+        return nil, err
+    }
+    return &user, nil
 }
+
 
 func (r *UserRepo) GetByName(Name string) (*entities.User, error) {
 	var user entities.User;
 
-	if err := r.DB.First(&user, "Name = ?", Name).Error; err != nil { // if <khai báo biến>; <condition>{}
+	if err := r.DB.First(&user, "name = ?", Name).Error; err != nil { // if <khai báo biến>; <condition>{}
 		return nil, err;
 	}
 	return &user, nil; // trả về con trỏ tới user vừa tạo và nil -> ko lỗi
@@ -60,7 +66,7 @@ func (repo *UserRepo) Update(newU *entities.User) error {
 		return errors.New("userID cannot be empty");
 	}
 	var user entities.User
-	if err := repo.DB.First(&user, "UserID = ?", newU.UserID).Error; err != nil {
+	if err := repo.DB.First(&user, "user_id = ?", newU.UserID).Error; err != nil {
 		return errors.New("undefined user");
 	}
 
@@ -70,7 +76,7 @@ func (repo *UserRepo) Update(newU *entities.User) error {
 
 func (repo *UserRepo) Delete(ID string) error {
 	// Tìm và xóa user dựa trên ID
-    result := repo.DB.Delete(&entities.User{}, "UserID = ?", ID)
+    result := repo.DB.Delete(&entities.User{}, "user_id = ?", ID)
     
     // Nếu có lỗi trong quá trình xóa (trừ trường hợp không tìm thấy)
     if result.Error != nil {

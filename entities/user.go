@@ -12,11 +12,11 @@ type User struct {
 	// gorm.Model
 
 	// field
-    UserID      string    `gorm:"primaryKey;type:varchar(20)"`
+    UserID      string    `gorm:"primaryKey;column:user_id;type:varchar(36)"`
     Password    string    `gorm:"type:varchar(100);not null"`
     Name        string    `gorm:"type:varchar(100);not null"`
-    DoB         time.Time `json:"dob"`
+    DoB         time.Time `gorm:"column:do_b"`
     Gender      string    `gorm:"type:varchar(10)"`
-    PhoneNumber string    `gorm:"type:varchar(20);not null"`
+    PhoneNumber string    `gorm:"type:varchar(20);not null;column:phone_number"`
 
 }

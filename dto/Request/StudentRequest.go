@@ -2,10 +2,8 @@ package request
 
 type CreateStudentRequest struct {
 	UserRequest CreateUserRequest;
-
 	School        string `json:"school" validate:"required"`
 	Room    string `json:"room" validate:"required"`
-
 
 }
 

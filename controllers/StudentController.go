@@ -1,10 +1,11 @@
 package controllers
 
 import (
-	"eParkKtx/dto/Request"
+	"eParkKtx/dto/request"
 	"eParkKtx/services"
 	"log"
 	"net/http"
+	"eParkKtx/dto/response"
 
 	"github.com/gin-gonic/gin"
 )
@@ -31,6 +32,8 @@ func NewStudentController(StudentService *services.StudentService) *StudentContr
 // @Failure 400 {object} map[string]interface{} "Dữ liệu không hợp lệ"
 // @Failure 500 {object} map[string]interface{} "Lỗi server"
 // @Router /students [post]
+
+
 func (sc *StudentController) CreateStudent(c *gin.Context) {
 	var req request.CreateStudentRequest
 
@@ -47,7 +50,7 @@ func (sc *StudentController) CreateStudent(c *gin.Context) {
 
 	log.Printf("Received request: %+v", req)
 
-	
+
 	// Gọi service để tạo sinh viên
 	if err := sc.StudentService.CreateStudent(req); err != nil {
 		log.Printf("[StudentController] Failed to create student: %v", err)
@@ -78,4 +81,52 @@ func (sc *StudentController) CreateStudent(c *gin.Context) {
 		"success": true,
 		"message": "Student created successfully",
 	})
+
+}
+
+
+
+
+
+func (sc *StudentController) GetStudentByName(c *gin.Context) {
+    var req request.GetStudentByNameRequest
+
+    // Validate và bind dữ liệu từ request
+    if err := c.ShouldBindJSON(&req); err != nil {
+        log.Printf("[StudentController] Invalid request data: %v", err)
+        c.JSON(http.StatusBadRequest, gin.H{
+            "success": false,
+            "error":   "Invalid request data",
+            "details": err.Error(),
+        })
+        return
+    }
+
+    // Gọi service để lấy thông tin sinh viên
+    student, err := sc.StudentService.GetStudentByName(req)
+    if err != nil {
+        log.Printf("[StudentController] Failed to get student: %v", err)
+        
+        if err.Error() == "student not found" {
+            c.JSON(http.StatusNotFound, gin.H{
+                "success": false,
+                "error":   "Student not found",
+            })
+        } else {
+            c.JSON(http.StatusInternalServerError, gin.H{
+                "success": false,
+                "error":   "Failed to get student information",
+            })
+        }
+        return
+    }
+
+    // Chuyển đổi sang response DTO
+    studentResponse := response.NewStudentResponse(student)
+
+    // Trả về response thành công
+    c.JSON(http.StatusOK, gin.H{
+        "success": true,
+        "data":    studentResponse,
+    })
 }
