@@ -47,7 +47,10 @@ go run main.go
 - `POST /api/students/search` - Tìm kiếm sinh viên theo tên
 - `POST /api/students/vehicles` - Đăng ký xe cho sinh viên
 
-### 2. Thanh toán
+### 2. Quản lý Bãi đỗ xe
+- `GET /api/park-management/vehicles` - Lấy danh sách tất cả xe đã đăng ký kèm thông tin sinh viên
+
+### 3. Thanh toán
 - `POST /api/payment/create` - Tạo liên kết thanh toán
 - `GET /api/payment/success` - Callback khi thanh toán thành công
 - `GET /api/payment/cancel` - Callback khi hủy thanh toán
@@ -158,9 +161,35 @@ go run main.go
 - **Description**: Endpoint được gọi khi người dùng hủy thanh toán, chuyển hướng về trang hủy thanh toán
 - **Redirects to**: `http://localhost:3000/payment-cancel`
 
-## 3. Vehicle Management
+## 3. Park Management
 
-### 2.1 Register Vehicle for Student
+### 3.1 Get All Registered Vehicles
+- **Method**: `GET`
+- **Endpoint**: `/api/park-management/vehicles`
+- **Description**: Lấy danh sách tất cả xe đã đăng ký kèm thông tin sinh viên
+- **Success Response (200)**:
+  ```json
+  {
+    "success": true,
+    "data": [
+      {
+        "vehicle_id": "vehicle123",
+        "number_plate": "29A-12345",
+        "vehicle_type": "Xe máy",
+        "color": "Đen",
+        "park_management_id": "park001",
+        "student_id": "student123",
+        "student_name": "Nguyễn Văn A"
+      }
+    ]
+  }
+  ```
+- **Error Responses**:
+  - `500 Internal Server Error`: Failed to get registered vehicles
+
+## 4. Vehicle Management
+
+### 4.1 Register Vehicle for Student
 - **Method**: `POST`
 - **Endpoint**: `/api/students/vehicles`
 - **Content-Type**: `application/json`

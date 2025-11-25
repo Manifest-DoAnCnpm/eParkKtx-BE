@@ -141,6 +141,11 @@ func main() {
 		PayOSChecksumKey,
 	)
 
+	// Khởi tạo ParkManagement repo, service và controller
+	parkManagementRepo := repositories.NewParkManagementRepo(userRepo)
+	parkManagementService := services.NewParkManagementService(parkManagementRepo)
+	parkManagementController := controllers.NewParkManagementController(parkManagementService)
+
 	// Khởi tạo controllers
 	studentController := &controllers.StudentController{
 		StudentService: studentService,
@@ -169,6 +174,7 @@ func main() {
 
 	// Thiết lập routes
 	routes.SetupStudentRoutes(r, studentController)
+	routes.SetupParkManagementRoutes(r, parkManagementController)
 	routes.SetupPaymentRoutes(r, paymentController)
 
 	// Chạy server

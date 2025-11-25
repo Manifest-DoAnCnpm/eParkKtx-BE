@@ -2,10 +2,10 @@ package controllers
 
 import (
 	"eParkKtx/dto/request"
+	"eParkKtx/dto/response"
 	"eParkKtx/services"
 	"log"
 	"net/http"
-	"eParkKtx/dto/response"
 
 	"github.com/gin-gonic/gin"
 )
@@ -20,8 +20,6 @@ func NewStudentController(StudentService *services.StudentService) *StudentContr
 		StudentService: StudentService,
 	}
 }
-	
-
 
 // CreateStudent xử lý yêu cầu tạo mới sinh viên
 // @Summary Tạo mới sinh viên
@@ -34,7 +32,6 @@ func NewStudentController(StudentService *services.StudentService) *StudentContr
 // @Failure 400 {object} map[string]interface{} "Dữ liệu không hợp lệ"
 // @Failure 500 {object} map[string]interface{} "Lỗi server"
 // @Router /students [post]
-
 
 func (sc *StudentController) CreateStudent(c *gin.Context) {
 	var req request.CreateStudentRequest
@@ -52,11 +49,10 @@ func (sc *StudentController) CreateStudent(c *gin.Context) {
 
 	log.Printf("Received request: %+v", req)
 
-
 	// Gọi service để tạo sinh viên
 	if err := sc.StudentService.CreateStudent(req); err != nil {
 		log.Printf("[StudentController] Failed to create student: %v", err)
-		
+
 		// Phân loại lỗi để trả về status code phù hợp
 		switch err.Error() {
 		case "username already exists":
@@ -86,46 +82,46 @@ func (sc *StudentController) CreateStudent(c *gin.Context) {
 }
 
 func (sc *StudentController) GetStudentByName(c *gin.Context) {
-    var req request.GetStudentByNameRequest
+	var req request.GetStudentByNameRequest
 
-    // Validate và bind dữ liệu từ request
-    if err := c.ShouldBindJSON(&req); err != nil {
-        log.Printf("[StudentController] Invalid request data: %v", err)
-        c.JSON(http.StatusBadRequest, gin.H{
-            "success": false,
-            "error":   "Invalid request data",
-            "details": err.Error(),
-        })
-        return
-    }
+	// Validate và bind dữ liệu từ request
+	if err := c.ShouldBindJSON(&req); err != nil {
+		log.Printf("[StudentController] Invalid request data: %v", err)
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"error":   "Invalid request data",
+			"details": err.Error(),
+		})
+		return
+	}
 
-    // Gọi service để lấy thông tin sinh viên
-    student, err := sc.StudentService.GetStudentByName(req)
-    if err != nil {
-        log.Printf("[StudentController] Failed to get student: %v", err)
-        
-        if err.Error() == "student not found" {
-            c.JSON(http.StatusNotFound, gin.H{
-                "success": false,
-                "error":   "Student not found",
-            })
-        } else {
-            c.JSON(http.StatusInternalServerError, gin.H{
-                "success": false,
-                "error":   "Failed to get student information",
-            })
-        }
-        return
-    }
+	// Gọi service để lấy thông tin sinh viên
+	student, err := sc.StudentService.GetStudentByName(req)
+	if err != nil {
+		log.Printf("[StudentController] Failed to get student: %v", err)
 
-    // Chuyển đổi sang response DTO
-    studentResponse := response.NewStudentResponse(student)
+		if err.Error() == "student not found" {
+			c.JSON(http.StatusNotFound, gin.H{
+				"success": false,
+				"error":   "Student not found",
+			})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"success": false,
+				"error":   "Failed to get student information",
+			})
+		}
+		return
+	}
 
-    // Trả về response thành công
-    c.JSON(http.StatusOK, gin.H{
-        "success": true,
-        "data":    studentResponse,
-    })
+	// Chuyển đổi sang response DTO
+	studentResponse := response.NewStudentResponse(student)
+
+	// Trả về response thành công
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"data":    studentResponse,
+	})
 }
 
 // RegisterVehicle xử lý yêu cầu đăng ký xe cho sinh viên
@@ -162,7 +158,7 @@ func (sc *StudentController) RegisterVehicle(c *gin.Context) {
 		log.Printf("[StudentController] Error registering vehicle: %v", err)
 		statusCode := http.StatusInternalServerError
 		errMsg := "Failed to register vehicle"
-		
+
 		if err.Error() == "student not found" {
 			statusCode = http.StatusNotFound
 			errMsg = "Student not found"
