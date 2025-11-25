@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"time"
 
 	"eParkKtx/config"
 	"eParkKtx/controllers"
@@ -12,8 +13,78 @@ import (
 	"eParkKtx/services"
 
 	"github.com/gin-gonic/gin"
-	
+	"gorm.io/gorm"
 )
+
+// initSampleData khởi tạo dữ liệu mẫu cho các bảng
+func initSampleData(db *gorm.DB) error {
+	// Tạo user quản lý ký túc xá
+	dormManager := entities.User{
+		UserID:      "dorm_manager",
+		Name:        "Nguyễn Văn A",
+		Password:    "$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi", // password
+		PhoneNumber: "0912345678",
+		DoB:         time.Date(1990, 1, 1, 0, 0, 0, 0, time.UTC),
+		Gender:      "Nam",
+	}
+
+	// Tạo user quản lý bãi đỗ xe 1
+	parkManager1 := entities.User{
+		UserID:      "park_manager1",
+		Name:        "Trần Thị B",
+		Password:    "$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi", // password
+		PhoneNumber: "0912345679",
+		DoB:         time.Date(1991, 2, 2, 0, 0, 0, 0, time.UTC),
+		Gender:      "Nữ",
+	}
+
+	// Tạo user quản lý bãi đỗ xe 2
+	parkManager2 := entities.User{
+		UserID:      "park_manager2",
+		Name:        "Lê Văn C",
+		Password:    "$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi", // password
+		PhoneNumber: "0912345680",
+		DoB:         time.Date(1992, 3, 3, 0, 0, 0, 0, time.UTC),
+		Gender:      "Nam",
+	}
+
+	// Tạo các user nếu chưa tồn tại
+	users := []entities.User{dormManager, parkManager1, parkManager2}
+	for _, user := range users {
+		if err := db.FirstOrCreate(&entities.User{}, user).Error; err != nil {
+			return err
+		}
+	}
+
+	// Tạo dữ liệu mẫu cho bảng DormitoryManagement (1 user quản lý nhiều tòa)
+	var dormCount int64
+	db.Model(&entities.DormitoryManagement{}).Count(&dormCount)
+	if dormCount == 0 {
+		dorms := []entities.DormitoryManagement{
+			{UserID: "dorm_manager", Building: "Tòa A"},
+		}
+		if err := db.Create(&dorms).Error; err != nil {
+			return err
+		}
+		log.Println("Đã thêm dữ liệu mẫu cho bảng DormitoryManagement")
+	}
+
+	// Tạo dữ liệu mẫu cho bảng ParkManagement (mỗi user quản lý một bãi đỗ)
+	var parkCount int64
+	db.Model(&entities.ParkManagement{}).Count(&parkCount)
+	if parkCount == 0 {
+		parks := []entities.ParkManagement{
+			{UserID: "park_manager1", ParkName: "Bãi đỗ xe KTX A"},
+			{UserID: "park_manager2", ParkName: "Bãi đỗ xe KTX B"},
+		}
+		if err := db.Create(&parks).Error; err != nil {
+			return err
+		}
+		log.Println("Đã thêm dữ liệu mẫu cho bảng ParkManagement")
+	}
+
+	return nil
+}
 
 func main() {
 	// Kết nối database SQLite
@@ -21,9 +92,23 @@ func main() {
 	db := config.DB
 
 	// Tự động tạo bảng nếu chưa tồn tại
-	err := db.AutoMigrate(&entities.User{}, &entities.Student{})
+	err := db.AutoMigrate(
+		&entities.User{},
+		&entities.Student{},
+		&entities.Vehicle{},
+		&entities.Contract{},
+		&entities.DormitoryManagement{},
+		&entities.EEHistory{},
+		&entities.Garage{},
+		&entities.ParkManagement{},
+	)
 	if err != nil {
 		log.Fatalf("Không thể migrate database: %v", err)
+	}
+
+	// Khởi tạo dữ liệu mẫu
+	if err := initSampleData(db); err != nil {
+		log.Fatalf("Không thể khởi tạo dữ liệu mẫu: %v", err)
 	}
 
 	// Khởi tạo repositories
