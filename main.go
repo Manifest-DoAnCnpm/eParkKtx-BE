@@ -16,6 +16,12 @@ import (
 	"gorm.io/gorm"
 )
 
+const (
+	PayOSClientID    = "07622372-99f6-4a21-9376-52932d63d091"
+	PayOSApiKey      = "ac6155d0-0d3e-46c8-8c42-49975f7956d8"
+	PayOSChecksumKey = "fdd5d4c9d46d2b984e115a285b08b97243a919ebbbfae812bf2593206d2e324c"
+)
+
 // initSampleData khởi tạo dữ liệu mẫu cho các bảng
 func initSampleData(db *gorm.DB) error {
 	// Tạo user quản lý ký túc xá
@@ -128,10 +134,20 @@ func main() {
 		StudentRepo: studentRepo,
 	}
 
+	// Khởi tạo PayOS service
+	payOSService := services.NewPayOSService(
+		PayOSClientID,
+		PayOSApiKey,
+		PayOSChecksumKey,
+	)
+
 	// Khởi tạo controllers
 	studentController := &controllers.StudentController{
 		StudentService: studentService,
 	}
+
+	// Khởi tạo payment controller
+	paymentController := controllers.NewPaymentController(payOSService)
 
 	// Khởi tạo Gin router
 	r := gin.Default()
@@ -153,6 +169,7 @@ func main() {
 
 	// Thiết lập routes
 	routes.SetupStudentRoutes(r, studentController)
+	routes.SetupPaymentRoutes(r, paymentController)
 
 	// Chạy server
 	port := os.Getenv("PORT")

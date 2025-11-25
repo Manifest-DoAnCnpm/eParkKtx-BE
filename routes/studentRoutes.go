@@ -15,6 +15,7 @@ func SetupStudentRoutes(router *gin.Engine, studentController *controllers.Stude
 		{
 			students.POST("", studentController.CreateStudent)
 			students.POST("/search", studentController.GetStudentByName)
+			students.POST("/vehicles", studentController.RegisterVehicle)
 
 			// Có thể thêm các endpoint khác ở đây
 

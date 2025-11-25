@@ -20,6 +20,8 @@ func NewStudentController(StudentService *services.StudentService) *StudentContr
 		StudentService: StudentService,
 	}
 }
+	
+
 
 // CreateStudent xử lý yêu cầu tạo mới sinh viên
 // @Summary Tạo mới sinh viên
@@ -81,12 +83,7 @@ func (sc *StudentController) CreateStudent(c *gin.Context) {
 		"success": true,
 		"message": "Student created successfully",
 	})
-
 }
-
-
-
-
 
 func (sc *StudentController) GetStudentByName(c *gin.Context) {
     var req request.GetStudentByNameRequest
@@ -129,4 +126,62 @@ func (sc *StudentController) GetStudentByName(c *gin.Context) {
         "success": true,
         "data":    studentResponse,
     })
+}
+
+// RegisterVehicle xử lý yêu cầu đăng ký xe cho sinh viên
+// @Summary Đăng ký xe cho sinh viên
+// @Description Đăng ký thông tin xe mới cho sinh viên
+// @Tags students
+// @Accept json
+// @Produce json
+// @Param vehicle body request.RegisterVehicleRequest true "Thông tin đăng ký xe"
+// @Success 200 {object} map[string]interface{} "Đăng ký thành công"
+// @Failure 400 {object} map[string]interface{} "Dữ liệu không hợp lệ"
+// @Failure 404 {object} map[string]interface{} "Không tìm thấy sinh viên"
+// @Failure 500 {object} map[string]interface{} "Lỗi server"
+// @Router /students/vehicles [post]
+func (sc *StudentController) RegisterVehicle(c *gin.Context) {
+	var req request.RegisterVehicleRequest
+
+	// Validate và bind dữ liệu từ request
+	if err := c.ShouldBindJSON(&req); err != nil {
+		log.Printf("[StudentController] Invalid vehicle registration data: %v", err)
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"error":   "Invalid request data",
+			"details": err.Error(),
+		})
+		return
+	}
+
+	log.Printf("[StudentController] Registering vehicle for student: %s", req.StudentID)
+
+	// Gọi service để đăng ký xe
+	err := sc.StudentService.RegisterVehicle(req)
+	if err != nil {
+		log.Printf("[StudentController] Error registering vehicle: %v", err)
+		statusCode := http.StatusInternalServerError
+		errMsg := "Failed to register vehicle"
+		
+		if err.Error() == "student not found" {
+			statusCode = http.StatusNotFound
+			errMsg = "Student not found"
+		}
+
+		c.JSON(statusCode, gin.H{
+			"success": false,
+			"error":   errMsg,
+			"details": err.Error(),
+		})
+		return
+	}
+
+	log.Printf("[StudentController] Successfully registered vehicle for student: %s", req.StudentID)
+
+	// Trả về thông báo thành công
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "Đăng ký xe thành công",
+		"data":    req,
+	})
 }

@@ -102,6 +102,42 @@ go run main.go
   - `404 Not Found`: Student not found
   - `500 Internal Server Error`: Failed to get student information
 
+## 2. Vehicle Management
+
+### 2.1 Register Vehicle for Student
+- **Method**: `POST`
+- **Endpoint**: `/api/students/vehicles`
+- **Content-Type**: `application/json`
+- **Request Body**:
+  ```json
+  {
+    "student_id": "student123",
+    "number_plate": "29A-12345",
+    "vehicle_type": "Xe máy",
+    "color": "Đen",
+    "park_management_id": "park001"
+  }
+  ```
+- **Success Response (200)**:
+  ```json
+  {
+    "success": true,
+    "message": "Đăng ký xe thành công",
+    "data": {
+      "student_id": "student123",
+      "number_plate": "29A-12345",
+      "vehicle_type": "Xe máy",
+      "color": "Đen",
+      "park_management_id": "park001"
+    }
+  }
+  ```
+- **Error Responses**:
+  - `400 Bad Request`: Invalid request data
+  - `404 Not Found`: Student not found
+  - `409 Conflict`: Vehicle with this number plate already exists
+  - `500 Internal Server Error`: Failed to register vehicle
+
 <!-- ## 2. Payment
 
 ### 2.1 Create Payment
