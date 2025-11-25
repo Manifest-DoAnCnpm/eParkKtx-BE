@@ -38,7 +38,24 @@ go get github.com/payOSHQ/payos-lib-golang
 go run main.go
 ```
 
-# API Endpoints
+# eParkKtx API Documentation
+
+## 📋 Danh sách API Endpoints
+
+### 1. Quản lý Sinh viên
+- `POST /api/students` - Tạo mới sinh viên
+- `POST /api/students/search` - Tìm kiếm sinh viên theo tên
+- `POST /api/students/vehicles` - Đăng ký xe cho sinh viên
+
+### 2. Thanh toán
+- `POST /api/payment/create` - Tạo liên kết thanh toán
+- `GET /api/payment/success` - Callback khi thanh toán thành công
+- `GET /api/payment/cancel` - Callback khi hủy thanh toán
+
+### 3. Quản lý Xe
+- `POST /api/students/vehicles` - Đăng ký xe cho sinh viên
+
+---
 
 ## 1. Student Management
 
@@ -102,7 +119,46 @@ go run main.go
   - `404 Not Found`: Student not found
   - `500 Internal Server Error`: Failed to get student information
 
-## 2. Vehicle Management
+## 2. Payment Management
+
+### 2.1 Create Payment Link
+- **Method**: `POST`
+- **Endpoint**: `/api/payment/create`
+- **Content-Type**: `application/json`
+- **Request Body**:
+  ```json
+  {
+    "amount": 100000,
+    "description": "Phí gửi xe tháng 11/2023"
+  }
+  ```
+- **Success Response (200)**:
+  ```json
+  {
+    "success": true,
+    "pay_url": "https://payos.vn/pay/...",
+    "order_code": 1700900000,
+    "amount": 100000,
+    "description": "Phí gửi xe tháng 11/2023"
+  }
+  ```
+- **Error Responses**:
+  - `400 Bad Request`: Invalid request data
+  - `500 Internal Server Error`: Failed to create payment link
+
+### 2.2 Payment Success Callback
+- **Method**: `GET`
+- **Endpoint**: `/api/payment/success`
+- **Description**: Endpoint được gọi khi thanh toán thành công, chuyển hướng về trang thành công
+- **Redirects to**: `http://localhost:3000/payment-success`
+
+### 2.3 Payment Cancel Callback
+- **Method**: `GET`
+- **Endpoint**: `/api/payment/cancel`
+- **Description**: Endpoint được gọi khi người dùng hủy thanh toán, chuyển hướng về trang hủy thanh toán
+- **Redirects to**: `http://localhost:3000/payment-cancel`
+
+## 3. Vehicle Management
 
 ### 2.1 Register Vehicle for Student
 - **Method**: `POST`
