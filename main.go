@@ -12,10 +12,14 @@ import (
 	"eParkKtx/services"
 
 	"github.com/gin-gonic/gin"
-	
+	"github.com/joho/godotenv"
 )
 
 func main() {
+
+	// Load .env file
+	_ = godotenv.Load(".env/.env")
+
 	// Kết nối database SQLite
 	config.ConnectDatabase()
 	db := config.DB
@@ -48,6 +52,10 @@ func main() {
 		StudentService: studentService,
 	}
 
+	// Auth services + controller
+	authService := services.NewAuthService(userService)
+	authController := controllers.NewAuthController(authService, userService)
+
 	// Khởi tạo Gin router
 	r := gin.Default()
 
@@ -68,6 +76,7 @@ func main() {
 
 	// Thiết lập routes
 	routes.SetupStudentRoutes(r, studentController)
+	routes.AuthRoutes(r, authController)
 
 	// Chạy server
 	port := os.Getenv("PORT")

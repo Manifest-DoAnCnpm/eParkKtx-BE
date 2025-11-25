@@ -5,8 +5,13 @@ import (
 	"eParkKtx/repositories"
 	"errors"
 	"log"
+	"time"
+	"os"
+	"strconv"
 
 	"golang.org/x/crypto/bcrypt" // for encrypte password
+
+	"github.com/golang-jwt/jwt/v4"
 )
 
 /*
@@ -109,4 +114,62 @@ func (Userv *UserService) GetUserByID(ID string, Password string) (*entities.Use
 	}
 
 	return ExistedUser, nil
+}
+
+//------------------------ Auth Service ---------------------------------------
+// AuthService handles token generation for users.
+type AuthService struct {
+    UserSvc *UserService
+}
+
+// NewAuthService constructor.
+func NewAuthService(userSvc *UserService) *AuthService {
+    return &AuthService{UserSvc: userSvc}
+}
+
+// TokenPair holds access + refresh tokens.
+type TokenPair struct {
+    AccessToken  string
+    RefreshToken string
+}
+
+// GenerateTokensForUser creates access and refresh JWTs for a given user.
+func (as *AuthService) GenerateTokensForUser(u *entities.User) (*TokenPair, error) {
+    accessExp := getEnvIntDefault("ACCESS_EXPIRE_MIN", 15)
+    refreshExp := getEnvIntDefault("REFRESH_EXPIRE_MIN", 10080)
+
+    access, err := generateJWT(u, os.Getenv("JWT_SECRET"), accessExp)
+    if err != nil {
+        return nil, err
+    }
+    refresh, err := generateJWT(u, os.Getenv("REFRESH_SECRET"), refreshExp)
+    if err != nil {
+        return nil, err
+    }
+    return &TokenPair{AccessToken: access, RefreshToken: refresh}, nil
+}
+
+func generateJWT(u *entities.User, secret string, expireMinutes int) (string, error) {
+    if secret == "" {
+        return "", errors.New("jwt secret not configured")
+    }
+    claims := jwt.MapClaims{
+        "sub":  u.UserID,
+        "name": u.Name,
+        "role": u.Role,
+        "exp":  time.Now().Add(time.Duration(expireMinutes) * time.Minute).Unix(),
+    }
+    token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+    return token.SignedString([]byte(secret))
+}
+
+func getEnvIntDefault(name string, def int) int {
+    v := os.Getenv(name)
+    if v == "" {
+        return def
+    }
+    if i, err := strconv.Atoi(v); err == nil {
+        return i
+    }
+    return def
 }
