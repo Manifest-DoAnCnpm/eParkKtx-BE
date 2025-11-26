@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: eParkKTX_BE
+    env: go
+    plan: free
+    branch: main
+    buildCommand: go build -o main ./...
+    startCommand: ./main
+    autoDeploy: true
+    pullRequestPreviews: true
+    envVars:
+      - key: SQLITE_PATH
+        value: eparkktx.db
