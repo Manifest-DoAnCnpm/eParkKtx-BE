@@ -14,6 +14,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
+	"github.com/joho/godotenv"
 )
 
 const (
@@ -93,6 +94,10 @@ func initSampleData(db *gorm.DB) error {
 }
 
 func main() {
+
+	// Load .env file
+	_ = godotenv.Load(".env/.env")
+
 	// Kết nối database SQLite
 	config.ConnectDatabase()
 	db := config.DB
@@ -153,6 +158,9 @@ func main() {
 
 	// Khởi tạo payment controller
 	paymentController := controllers.NewPaymentController(payOSService)
+	// Auth services + controller
+	authService := services.NewAuthService(userService)
+	authController := controllers.NewAuthController(authService, userService)
 
 	// Khởi tạo Gin router
 	r := gin.Default()
@@ -176,6 +184,7 @@ func main() {
 	routes.SetupStudentRoutes(r, studentController)
 	routes.SetupParkManagementRoutes(r, parkManagementController)
 	routes.SetupPaymentRoutes(r, paymentController)
+	routes.AuthRoutes(r, authController)
 
 	// Chạy server
 	port := os.Getenv("PORT")

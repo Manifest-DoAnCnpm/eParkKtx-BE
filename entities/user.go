@@ -1,11 +1,10 @@
 package entities
 
 import (
-	
 	"time"
 )
 
-// `key:value` : tag cho thư viện đọc và mappping đúng giá trị 
+// `key:value` : tag cho thư viện đọc và mappping đúng giá trị
 type User struct {
 
 	// gorm.Model: nhúng các trường id, creatAt,.... vào struct
