@@ -72,7 +72,7 @@ func (us *UserService) CreateUser(user *entities.User) error {
 }
 
 // Hash password
-func HashPassword(password string) (string, error) {
+func (us *UserService)HashPassword(password string) (string, error) {
 
 	// default cost có độ phức tạp là 10
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
@@ -80,7 +80,7 @@ func HashPassword(password string) (string, error) {
 }
 
 // copare password string with password-hash in db
-func CheckPassword(password, hash string) bool {
+func (us *UserService)CheckPassword(password, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err == nil
 }

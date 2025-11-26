@@ -53,9 +53,11 @@ func (ac *AuthController) LoginCCCD(c *gin.Context) {
 	}
 
 	// Set refresh token in HttpOnly cookie
-	maxAge := getEnvIntDefault("REFRESH_EXPIRE_MIN", 10080) * 60 // seconds
+	maxAge := getEnvIntDefault("REFRESH_EXPIRE_MIN", 10080) * 60        // 7 days in seconds
+	accessTokenMaxAge := getEnvIntDefault("ACCESS_EXPIRE_MIN", 15) * 60 // 15 minutes in seconds
 	secure := os.Getenv("COOKIE_SECURE") == "true"
 
+	// Set refresh token in HTTP-only cookie
 	http.SetCookie(c.Writer, &http.Cookie{
 		Name:     "refresh_token",
 		Value:    tokens.RefreshToken,
@@ -66,14 +68,26 @@ func (ac *AuthController) LoginCCCD(c *gin.Context) {
 		SameSite: http.SameSiteLaxMode,
 	})
 
-	// Return access token & basic user info
+	// Set access token in HTTP-only cookie
+	http.SetCookie(c.Writer, &http.Cookie{
+		Name:     "access_token",
+		Value:    tokens.AccessToken,
+		Path:     "/",
+		MaxAge:   accessTokenMaxAge,
+		HttpOnly: true,
+		Secure:   secure,
+		SameSite: http.SameSiteLaxMode,
+	})
+
+	// Return user info without tokens in response body
 	c.JSON(http.StatusOK, gin.H{
 		"code":    200,
 		"message": "login success",
 		"data": gin.H{
-			"access_token": tokens.AccessToken,
 			"user": gin.H{
-				"user_id": user.UserID,
+				"access_token": tokens.AccessToken,
+				"refresh_token": tokens.RefreshToken,
+				"cccd": user.UserID,
 				"name":    user.Name,
 				// "role":    user.Role,
 			},

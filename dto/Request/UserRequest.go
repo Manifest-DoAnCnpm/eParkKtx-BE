@@ -2,25 +2,25 @@ package request
 
 type CreateUserRequest struct {
 	Name        string `json:"name" validate:"required"`
+	CCCD        string `json:"cccd" validate:"required"`
 	Password    string `json:"password" validate:"required,min=6"`
 	PhoneNumber string `json:"phone,omitempty" validate:"required,min=10"`
 	DoB         string `json:"dob" validate:"required"`
-	Gender      string `json:"gender" `
+	Gender      string `json:"gender"`
 }
 
 //constructor
 
-func CreateUserRequestInitialize(Name string, Password string, PhoneNumber string, Dob string, Gender string) CreateUserRequest{
+func CreateUserRequestInitialize(Name string, CCCD string, Password string, PhoneNumber string, Dob string, Gender string) CreateUserRequest {
 	return CreateUserRequest{
-		Name: Name,
-		Password: Password,
+		Name:        Name,
+		CCCD:        CCCD,
+		Password:    Password,
 		PhoneNumber: PhoneNumber,
-		DoB: Dob,
-		Gender: Gender,
+		DoB:         Dob,
+		Gender:      Gender,
 	}
 }
-
-
 
 // ------------check sauuu------------
 

@@ -13,8 +13,8 @@ import (
 	"eParkKtx/services"
 
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 	"github.com/joho/godotenv"
+	"gorm.io/gorm"
 )
 
 const (
@@ -181,8 +181,8 @@ func main() {
 	})
 
 	// Thiết lập routes
-	routes.SetupStudentRoutes(r, studentController)
-	routes.SetupParkManagementRoutes(r, parkManagementController)
+	routes.SetupStudentRoutes(r, studentController,userService)
+	routes.SetupParkManagementRoutes(r, parkManagementController,userService)
 	routes.SetupPaymentRoutes(r, paymentController)
 	routes.AuthRoutes(r, authController)
 

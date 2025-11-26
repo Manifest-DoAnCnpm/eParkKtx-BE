@@ -7,8 +7,6 @@ import (
 	"fmt"
 	"log"
 	"time"
-
-	"github.com/google/uuid"
 )
 
 /*
@@ -48,10 +46,14 @@ func (s *StudentService) CreateStudent(req request.CreateStudentRequest) error {
 	log.Printf("[StudentService] Received create student request: %+v", req)
 
 	// Tạo user trước
+	hashpass, err := s.UserService.HashPassword(req.UserRequest.Password)
+	if err != nil {
+		return err
+	}
 	user := &entities.User{
-		UserID:      uuid.New().String(),
+		UserID:      req.UserRequest.CCCD, // Sử dụng CCCD làm UserID
 		Name:        req.UserRequest.Name,
-		Password:    req.UserRequest.Password,
+		Password:    hashpass,
 		PhoneNumber: req.UserRequest.PhoneNumber,
 		DoB:         parseDateOfBirth(req.UserRequest.DoB),
 		Gender:      req.UserRequest.Gender,
