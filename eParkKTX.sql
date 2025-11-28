@@ -3,11 +3,12 @@ USE eparkktx;
 -- Bảng USER
 CREATE TABLE User (
     UserID VARCHAR(20) PRIMARY KEY,
-    user_password VARCHAR(30) NOT NULL,
+    user_password VARCHAR(100) NOT NULL,
     user_name VARCHAR(100) NOT NULL,
     DoB DATE,
     gender VARCHAR(10),
-    phone_number VARCHAR(20) NOT NULL
+    phone_number VARCHAR(20) NOT NULL,
+    Role ENUM('Dormitory_Management', 'Park_Management', 'Student') NOT NULL
 );
 
 -- Bảng BQL_KTX

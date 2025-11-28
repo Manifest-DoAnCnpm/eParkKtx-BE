@@ -1,0 +1,23 @@
+[
+  {
+    "cccd": "123",
+    "name": "Student_01",
+    "password": "Student01",
+    "phone": "0123456789",
+    "role": "Student"
+  },
+  {
+    "cccd": "456",
+    "name": "Park_Management_01",
+    "password": "Park01",
+    "phone": "0987654321",
+    "role": "Park_Management"
+  },
+  {
+    "cccd": "789",
+    "name": "Dormitory_Management_01",
+    "password": "Domitory01",
+    "phone": "0912345678",
+    "role": "Dormitory_Management"
+  }
+]

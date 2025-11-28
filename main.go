@@ -8,11 +8,13 @@ import (
 	"eParkKtx/config"
 	"eParkKtx/controllers"
 	"eParkKtx/entities"
+	"eParkKtx/middlewares"
 	"eParkKtx/repositories"
 	"eParkKtx/routes"
 	"eParkKtx/services"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	"gorm.io/gorm"
 )
 
@@ -93,6 +95,10 @@ func initSampleData(db *gorm.DB) error {
 }
 
 func main() {
+
+	// Load .env file
+	_ = godotenv.Load(".env/.env")
+
 	// Kết nối database SQLite
 	config.ConnectDatabase()
 	db := config.DB
@@ -153,9 +159,14 @@ func main() {
 
 	// Khởi tạo payment controller
 	paymentController := controllers.NewPaymentController(payOSService)
+	// Auth services + controller
+	authService := services.NewAuthService(userService)
+	authController := controllers.NewAuthController(authService, userService)
 
 	// Khởi tạo Gin router
 	r := gin.Default()
+
+
 
 	// Cấu hình CORS
 	r.Use(func(c *gin.Context) {
@@ -172,10 +183,13 @@ func main() {
 		c.Next()
 	})
 
+	 r.Use(middlewares.RateLimitMiddleware())
+
 	// Thiết lập routes
-	routes.SetupStudentRoutes(r, studentController)
-	routes.SetupParkManagementRoutes(r, parkManagementController)
+	routes.SetupStudentRoutes(r, studentController,userService)
+	routes.SetupParkManagementRoutes(r, parkManagementController,userService)
 	routes.SetupPaymentRoutes(r, paymentController)
+	routes.AuthRoutes(r, authController)
 
 	// Chạy server
 	port := os.Getenv("PORT")

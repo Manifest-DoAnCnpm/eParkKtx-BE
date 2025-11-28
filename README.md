@@ -42,150 +42,203 @@ go run main.go
 
 ## 📋 Danh sách API Endpoints
 
-### 1. Quản lý Sinh viên
+### 1. Authentication
+- `POST /api/auth/login-cccd` - Đăng nhập bằng CCCD và mật khẩu
+
+### 2. Student Management
 - `POST /api/students` - Tạo mới sinh viên
 - `POST /api/students/search` - Tìm kiếm sinh viên theo tên
 - `POST /api/students/vehicles` - Đăng ký xe cho sinh viên
 
-### 2. Quản lý Bãi đỗ xe
-- `GET /api/park-management/vehicles` - Lấy danh sách tất cả xe đã đăng ký kèm thông tin sinh viên
-
-### 3. Thanh toán
+### 2. Payment Management
 - `POST /api/payment/create` - Tạo liên kết thanh toán
 - `GET /api/payment/success` - Callback khi thanh toán thành công
 - `GET /api/payment/cancel` - Callback khi hủy thanh toán
 
-### 3. Quản lý Xe
-- `POST /api/students/vehicles` - Đăng ký xe cho sinh viên
+### 3. Park Management
+- `GET /api/park-management/vehicles` - Lấy danh sách tất cả xe đã đăng ký kèm thông tin sinh viên
 
----
 
-## 1. Student Management
+## 1. Authentication
 
-### 1.1 Create New Student
-- **Method**: `POST`
-- **Endpoint**: `/api/students`
-- **Content-Type**: `application/json`
-- **Request Body**:
-  ```json
-  {
-    "userRequest": {
-      "name": "Nguyễn Văn A",
-      "password": "matkhau12345",
-      "phoneNumber": "0123456789",
-      "dob": "2000-01-01",
-      "gender": "Nam"
-    },
+### 1.1 Login with CCCD
+Method: `POST`
+Endpoint: `/api/auth/login-cccd`
+Content-Type: `application/json`
+Request Body:
+```json
+{
+  "cccd": "123456789012",
+  "password": "matkhau123"
+}
+```
+
+Success Response (200):
+```json
+{
+  "code": 200,
+  "message": "login success",
+  "data": {
+    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "cccd": "123456789012",
+    "name": "Nguyễn Văn A"
+  }
+}
+```
+
+Cookies (HTTP-Only):
+- `access_token`: JWT token dùng để xác thực
+- `refresh_token`: Dùng để lấy access token mới
+
+Error Responses:
+- `400 Bad Request`: Dữ liệu không hợp lệ
+- `401 Unauthorized`: CCCD hoặc mật khẩu không đúng
+- `500 Internal Server Error`: Lỗi server
+
+## 2. Student Management
+
+### 2.1 Create New Student
+Method: `POST`
+Endpoint: `/api/students`
+Content-Type: `application/json`
+Request Body:
+```json
+{
+  "userRequest": {
+    "cccd": "123456789012",
+    "name": "Nguyễn Văn A",
+    "password": "matkhau12345",
+    "phoneNumber": "0123456789",
+    "dob": "2000-01-01",
+    "gender": "Nam"
+  },
+  "school": "Đại học Công nghệ",
+  "room": "A101"
+}
+```
+
+Success Response (201):
+```json
+{
+  "success": true,
+  "message": "Student created successfully"
+}
+```
+
+Error Responses:
+- `400 Bad Request`: Invalid request data
+- `409 Conflict`: Username already exists
+- `500 Internal Server Error`: Failed to create student
+
+### 2.2 Search Student by Name
+Method: `POST`
+Endpoint: `/api/students/search`
+Content-Type: `application/json`
+Request Body:
+```json
+{
+  "name": "Nguyễn Văn A"
+}
+```
+
+Success Response (200):
+```json
+{
+  "success": true,
+  "data": {
+    "user_id": "ea3e6056-c844-4f2a-85c2-22928cf89fc2",
+    "name": "Nguyễn Văn A",
+    "phone_number": "0123456789",
+    "gender": "Nam",
+    "dob": "2000-01-01T00:00:00Z",
     "school": "Đại học Công nghệ",
     "room": "A101"
   }
-  ```
-- **Success Response (201)**:
-  ```json
-  {
-    "success": true,
-    "message": "Student created successfully"
-  }
-  ```
-- **Error Responses**:
-  - `400 Bad Request`: Invalid request data
-  - `409 Conflict`: Username already exists
-  - `500 Internal Server Error`: Failed to create student
+}
+```
 
-### 1.2 Search Student by Name
-- **Method**: `POST`
-- **Endpoint**: `/api/students/search`
-- **Content-Type**: `application/json`
-- **Request Body**:
-  ```json
-  {
-    "name": "Nguyễn Văn A"
+Error Responses:
+- `400 Bad Request`: Invalid request data
+- `404 Not Found`: Student not found
+- `500 Internal Server Error`: Failed to get student information
+
+### 2.3 Register Vehicle for Student
+Method: `POST`
+Endpoint: `/api/students/vehicles`
+Content-Type: `application/json`
+Request Body:
+```json
+{
+  "student_id": "student123",
+  "number_plate": "29A-12345",
+  "vehicle_type": "Xe máy",
+  "color": "Đen",
+  "park_management_id": "park001"
+}
+```
+
+Success Response (200):
+```json
+{
+  "success": true,
+  "message": "Đăng ký xe thành công",
+  "data": {
+    "student_id": "student123",
+    "number_plate": "29A-12345",
+    "vehicle_type": "Xe máy",
+    "color": "Đen",
+    "park_management_id": "park001"
   }
-  ```
-- **Success Response (200)**:
-  ```json
-  {
-    "success": true,
-    "data": {
-      "user_id": "ea3e6056-c844-4f2a-85c2-22928cf89fc2",
-      "name": "Nguyễn Văn A",
-      "phone_number": "0123456789",
-      "gender": "Nam",
-      "dob": "2000-01-01T00:00:00Z",
-      "school": "Đại học Công nghệ",
-      "room": "A101"
-    }
-  }
-  ```
-- **Error Responses**:
-  - `400 Bad Request`: Invalid request data
-  - `404 Not Found`: Student not found
-  - `500 Internal Server Error`: Failed to get student information
+}
+```
+
+Error Responses:
+- `400 Bad Request`: Dữ liệu không hợp lệ
+- `404 Not Found`: Không tìm thấy sinh viên
+- `409 Conflict`: Biển số xe đã được đăng ký
+- `500 Internal Server Error`: Lỗi server
 
 ## 2. Payment Management
 
 ### 2.1 Create Payment Link
-- **Method**: `POST`
-- **Endpoint**: `/api/payment/create`
-- **Content-Type**: `application/json`
-- **Request Body**:
-  ```json
-  {
-    "amount": 100000,
-    "description": "Phí gửi xe tháng 11/2023"
-  }
-  ```
-- **Success Response (200)**:
-  ```json
-  {
-    "success": true,
-    "pay_url": "https://payos.vn/pay/...",
-    "order_code": 1700900000,
-    "amount": 100000,
-    "description": "Phí gửi xe tháng 11/2023"
-  }
-  ```
-- **Error Responses**:
-  - `400 Bad Request`: Invalid request data
-  - `500 Internal Server Error`: Failed to create payment link
+Method: `POST`
+Endpoint: `/api/payment/create`
+Content-Type: `application/json`
+Request Body:
+```json
+{
+  "amount": 100000,
+  "description": "Phí gửi xe tháng 11/2023"
+}
+```
+
+Success Response (200):
+```json
+{
+  "success": true,
+  "pay_url": "https://payos.vn/pay/...",
+  "order_code": 1700900000,
+  "amount": 100000,
+  "description": "Phí gửi xe tháng 11/2023"
+}
+```
+
+Error Responses:
+- `400 Bad Request`: Invalid request data
+- `500 Internal Server Error`: Failed to create payment link
 
 ### 2.2 Payment Success Callback
-- **Method**: `GET`
-- **Endpoint**: `/api/payment/success`
-- **Description**: Endpoint được gọi khi thanh toán thành công, chuyển hướng về trang thành công
-- **Redirects to**: `http://localhost:3000/payment-success`
+Method: `GET`
+Endpoint: `/api/payment/success`
+Description: Endpoint được gọi khi thanh toán thành công, chuyển hướng về trang thành công
+Redirects to: `http://localhost:3000/payment-success`
 
 ### 2.3 Payment Cancel Callback
-- **Method**: `GET`
-- **Endpoint**: `/api/payment/cancel`
-- **Description**: Endpoint được gọi khi người dùng hủy thanh toán, chuyển hướng về trang hủy thanh toán
-- **Redirects to**: `http://localhost:3000/payment-cancel`
-
-## 3. Park Management
-
-### 3.1 Get All Registered Vehicles
-- **Method**: `GET`
-- **Endpoint**: `/api/park-management/vehicles`
-- **Description**: Lấy danh sách tất cả xe đã đăng ký kèm thông tin sinh viên
-- **Success Response (200)**:
-  ```json
-  {
-    "success": true,
-    "data": [
-      {
-        "vehicle_id": "vehicle123",
-        "number_plate": "29A-12345",
-        "vehicle_type": "Xe máy",
-        "color": "Đen",
-        "park_management_id": "park001",
-        "student_id": "student123",
-        "student_name": "Nguyễn Văn A"
-      }
-    ]
-  }
-  ```
-- **Error Responses**:
-  - `500 Internal Server Error`: Failed to get registered vehicles
+Method: `GET`
+Endpoint: `/api/payment/cancel`
+Description: Endpoint được gọi khi người dùng hủy thanh toán, chuyển hướng về trang hủy thanh toán
+Redirects to: `http://localhost:3000/payment-cancel`
 
 ## 4. Vehicle Management
 
@@ -261,4 +314,3 @@ go run main.go
 - **Frontend**: ReactJS,...
 - **Database**: SQLite
 - **Khác**: REST API, Docker (tùy chọn triển khai), GitHub Actions (CI/CD)
-
