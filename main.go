@@ -8,6 +8,7 @@ import (
 	"eParkKtx/config"
 	"eParkKtx/controllers"
 	"eParkKtx/entities"
+	"eParkKtx/middlewares"
 	"eParkKtx/repositories"
 	"eParkKtx/routes"
 	"eParkKtx/services"
@@ -165,6 +166,8 @@ func main() {
 	// Khởi tạo Gin router
 	r := gin.Default()
 
+
+
 	// Cấu hình CORS
 	r.Use(func(c *gin.Context) {
 		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
@@ -179,6 +182,8 @@ func main() {
 
 		c.Next()
 	})
+
+	 r.Use(middlewares.RateLimitMiddleware())
 
 	// Thiết lập routes
 	routes.SetupStudentRoutes(r, studentController,userService)
