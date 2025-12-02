@@ -16,6 +16,8 @@ import (
 	_ "eParkKtx/docs" // Import the docs package
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
+	"gorm.io/gorm"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
@@ -194,8 +196,14 @@ func main() {
 	// Swagger route
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
+	// Setup rate limiting
+	r.Use(middlewares.RateLimitMiddleware())
+
 	// Thiết lập routes
-	routes.SetupStudentRoutes(r, studentController)
+	routes.SetupStudentRoutes(r, studentController, userService)
+	routes.SetupParkManagementRoutes(r, parkManagementController)
+	routes.SetupPaymentRoutes(r, paymentController)
+	routes.AuthRoutes(r, authController)
 
 	log.Println("📚 Swagger UI available at http://localhost:" + port + "/swagger/index.html")
 
