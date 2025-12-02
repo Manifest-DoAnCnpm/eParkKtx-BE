@@ -16,13 +16,8 @@ import (
 	_ "eParkKtx/docs" // Import the docs package
 
 	"github.com/gin-gonic/gin"
-<<<<<<< HEAD
-	"github.com/joho/godotenv"
-	"gorm.io/gorm"
-=======
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
->>>>>>> 69b6ac3 (swagger)
 )
 
 const (
@@ -190,19 +185,7 @@ func main() {
 		c.Next()
 	})
 
-<<<<<<< HEAD
-	 r.Use(middlewares.RateLimitMiddleware())
-
-	// Thiết lập routes
-	routes.SetupStudentRoutes(r, studentController,userService)
-	routes.SetupParkManagementRoutes(r, parkManagementController,userService)
-	routes.SetupPaymentRoutes(r, paymentController)
-	routes.AuthRoutes(r, authController)
-
-	// Chạy server
-=======
 	// Lấy cổng từ biến môi trường hoặc sử dụng mặc định
->>>>>>> 69b6ac3 (swagger)
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
