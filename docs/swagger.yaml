@@ -1,0 +1,70 @@
+definitions:
+  request.CreateStudentRequest:
+    properties:
+      room:
+        type: string
+      school:
+        type: string
+      userRequest:
+        $ref: '#/definitions/request.CreateUserRequest'
+    required:
+    - room
+    - school
+    type: object
+  request.CreateUserRequest:
+    properties:
+      dob:
+        type: string
+      gender:
+        type: string
+      name:
+        type: string
+      password:
+        minLength: 6
+        type: string
+      phone:
+        minLength: 10
+        type: string
+    required:
+    - dob
+    - name
+    - password
+    - phone
+    type: object
+info:
+  contact: {}
+paths:
+  /students:
+    post:
+      consumes:
+      - application/json
+      description: Tạo tài khoản sinh viên mới với thông tin được cung cấp
+      parameters:
+      - description: Thông tin sinh viên
+        in: body
+        name: student
+        required: true
+        schema:
+          $ref: '#/definitions/request.CreateStudentRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Tạo thành công
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Dữ liệu không hợp lệ
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Lỗi server
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Tạo mới sinh viên
+      tags:
+      - students
+swagger: "2.0"

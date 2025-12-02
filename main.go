@@ -13,9 +13,16 @@ import (
 	"eParkKtx/routes"
 	"eParkKtx/services"
 
+	_ "eParkKtx/docs" // Import the docs package
+
 	"github.com/gin-gonic/gin"
+<<<<<<< HEAD
 	"github.com/joho/godotenv"
 	"gorm.io/gorm"
+=======
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+>>>>>>> 69b6ac3 (swagger)
 )
 
 const (
@@ -183,6 +190,7 @@ func main() {
 		c.Next()
 	})
 
+<<<<<<< HEAD
 	 r.Use(middlewares.RateLimitMiddleware())
 
 	// Thiết lập routes
@@ -192,10 +200,23 @@ func main() {
 	routes.AuthRoutes(r, authController)
 
 	// Chạy server
+=======
+	// Lấy cổng từ biến môi trường hoặc sử dụng mặc định
+>>>>>>> 69b6ac3 (swagger)
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
 	}
+
+	// Swagger route
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
+	// Thiết lập routes
+	routes.SetupStudentRoutes(r, studentController)
+
+	log.Println("📚 Swagger UI available at http://localhost:" + port + "/swagger/index.html")
+
+	// Chạy server
 
 	log.Printf("🚀 Server đang chạy tại http://localhost:%s", port)
 	if err := r.Run(":" + port); err != nil {
