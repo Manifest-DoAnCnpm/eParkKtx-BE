@@ -1,0 +1,105 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {}
+    },
+    "paths": {
+        "/students": {
+            "post": {
+                "description": "Tạo tài khoản sinh viên mới với thông tin được cung cấp",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "students"
+                ],
+                "summary": "Tạo mới sinh viên",
+                "parameters": [
+                    {
+                        "description": "Thông tin sinh viên",
+                        "name": "student",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.CreateStudentRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Tạo thành công",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Dữ liệu không hợp lệ",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Lỗi server",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "request.CreateStudentRequest": {
+            "type": "object",
+            "required": [
+                "room",
+                "school"
+            ],
+            "properties": {
+                "room": {
+                    "type": "string"
+                },
+                "school": {
+                    "type": "string"
+                },
+                "userRequest": {
+                    "$ref": "#/definitions/request.CreateUserRequest"
+                }
+            }
+        },
+        "request.CreateUserRequest": {
+            "type": "object",
+            "required": [
+                "dob",
+                "name",
+                "password",
+                "phone"
+            ],
+            "properties": {
+                "dob": {
+                    "type": "string"
+                },
+                "gender": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string",
+                    "minLength": 6
+                },
+                "phone": {
+                    "type": "string",
+                    "minLength": 10
+                }
+            }
+        }
+    }
+}

@@ -8,12 +8,18 @@ import (
 	"eParkKtx/config"
 	"eParkKtx/controllers"
 	"eParkKtx/entities"
+	"eParkKtx/middlewares"
 	"eParkKtx/repositories"
 	"eParkKtx/routes"
 	"eParkKtx/services"
 
+	_ "eParkKtx/docs" // Import the docs package
+
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	"gorm.io/gorm"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 const (
@@ -93,6 +99,10 @@ func initSampleData(db *gorm.DB) error {
 }
 
 func main() {
+
+	// Load .env file
+	_ = godotenv.Load(".env/.env")
+
 	// Kết nối database SQLite
 	config.ConnectDatabase()
 	db := config.DB
@@ -153,9 +163,14 @@ func main() {
 
 	// Khởi tạo payment controller
 	paymentController := controllers.NewPaymentController(payOSService)
+	// Auth services + controller
+	authService := services.NewAuthService(userService)
+	authController := controllers.NewAuthController(authService, userService)
 
 	// Khởi tạo Gin router
 	r := gin.Default()
+
+
 
 	// Cấu hình CORS
 	r.Use(func(c *gin.Context) {
@@ -172,16 +187,27 @@ func main() {
 		c.Next()
 	})
 
-	// Thiết lập routes
-	routes.SetupStudentRoutes(r, studentController)
-	routes.SetupParkManagementRoutes(r, parkManagementController)
-	routes.SetupPaymentRoutes(r, paymentController)
-
-	// Chạy server
+	// Lấy cổng từ biến môi trường hoặc sử dụng mặc định
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
 	}
+
+	// Swagger route
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
+	// Setup rate limiting
+	r.Use(middlewares.RateLimitMiddleware())
+
+	// Thiết lập routes
+	routes.SetupStudentRoutes(r, studentController, userService)
+	routes.SetupParkManagementRoutes(r, parkManagementController)
+	routes.SetupPaymentRoutes(r, paymentController)
+	routes.AuthRoutes(r, authController)
+
+	log.Println("📚 Swagger UI available at http://localhost:" + port + "/swagger/index.html")
+
+	// Chạy server
 
 	log.Printf("🚀 Server đang chạy tại http://localhost:%s", port)
 	if err := r.Run(":" + port); err != nil {
